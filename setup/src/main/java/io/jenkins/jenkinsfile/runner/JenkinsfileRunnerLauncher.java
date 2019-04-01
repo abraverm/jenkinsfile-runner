@@ -7,7 +7,10 @@ import io.jenkins.jenkinsfile.runner.bootstrap.ClassLoaderBuilder;
 import jenkins.slaves.DeprecatedAgentProtocolMonitor;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -52,9 +55,16 @@ public class JenkinsfileRunnerLauncher extends JenkinsEmbedder {
         context.getSecurityHandler().setLoginService(configureUserRealm());
         context.setResourceBase(bootstrap.warDir.getPath());
 
-        server.start();
+        ServerConnector connector = new ServerConnector(server);
+        HttpConfiguration config = connector.getConnectionFactory(HttpConnectionFactory.class).getHttpConfiguration();
+        config.setRequestHeaderSize(12 * 1024);
+        String host = System.getenv("JENKINS_HOST");
+        String port = System.getenv("JENKINS_PORT");
+        connector.setHost(host);
+        connector.setPort(Integer.parseInt(port));
+        server.addConnector(connector);
 
-        localPort = -1;
+        server.start();
 
         setPluginManager(new PluginManagerImpl(context.getServletContext(), bootstrap.pluginsDir));
 
