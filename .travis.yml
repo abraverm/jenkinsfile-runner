@@ -1,0 +1,23 @@
+language: java
+git:
+  depth: 1
+  quite: true
+  submodules: false
+before_deploy:
+- mvn package -DskipTests
+- cp -R app/target/appassembler jenkinsfile-runner.AppDir
+- cp jenkinsfile-runner.desktop jenkinsfile-runner.AppDir
+- pushd jenkinsfile-runner.AppDir && ln -s bin/jenkinsfile-runner AppRun && popd
+- wget -O jenkinsfile-runner.AppDir/jenkinsfile-runner.svg https://jenkins.io/images/logos/jenkins/jenkins.png
+- wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+- chmod +x appimagetool-x86_64.AppImage
+- ARCH=x86_64 ./appimagetool-x86_64.AppImage jenkinsfile-runner.AppDir jenkinsfile-runner.AppImage
+- chmod +x jenkinsfile-runner.AppImage
+- "./jenkinsfile-runner.AppImage --help"
+deploy:
+  provider: releases
+  api_key:
+    secure: WozdTcPt3wA6hQMTtT8oFgPh7DQPSssCpZ36TmF36Edj7z6WCnIgr3BvTISnyDsceZyebxfRLhX9QG8JveEWSn3cKuOXsOjPzV7lBVo1neCp335I+qjLy3HLcEIMGbb0g2QS8Km+AmLuzLfLxWdDbVpMt+asKWDT/Grgn8wC9GEQ/31Ucwu0k3YKyqrPHkmVhfF6PDTPCmrgQbHvoYtHiDvrd0c7BjA0XTY9tcyEAR5fBj/kr6v21NkoLO+4oKc3XO/StIfBlIONiR+xTn5nRF0tl6qfshUAAgNdHyG85XQBZqwKOmww0Z+CRVKRAEmIg3aaB09EFCBvcZENODke8nGIXc5z1XOSvHCst0MCbD+C5lnRJV5iERTjF+TJ6ZlOMVRdKk5uyUhSOx7JwpTRLlJD4pqYnW/xYHxvbiMHI0lI6SlL5VWze/KUwNISml/wbpusGL0/bBvzQmO8ACqmqfg5wS8aDmzhQC1K5DEZ6VrQBTHC4KSmTzI1yYxQYoyHtxtMrT1PheD53epRuewEe/YceO92pPt15+/HnyhGOAoJ1WSRFMSxi+xHlJdL5UkMat2KTAZTXkDImnoAhG+9P0P6+LTdwkK0ayjEd9izqV5SDpeyL1RGTeGg92EK+wOlgTaqtncqKUffDJ0LTXTG+E8eTZ9Xlp7iFboYR7D+kGw=
+  file: jenkinsfile-runner.AppImage
+  skip_cleanup: true
+  overwrite: true

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Jenkinsfile-runner
+Exec=jenkinsfile-runner
+Icon=jenkinsfile-runner
+Type=Application
+Categories=Audio;AudioVideo;
+Terminal=true
+StartupNotify=false
+NoDisplay=true
