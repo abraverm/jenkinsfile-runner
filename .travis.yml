@@ -21,3 +21,4 @@ deploy:
   file: jenkinsfile-runner.AppImage
   skip_cleanup: true
   overwrite: true
+  draft: true
